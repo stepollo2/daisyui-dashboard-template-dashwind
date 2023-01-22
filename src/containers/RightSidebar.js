@@ -1,7 +1,21 @@
 import XMarkIcon  from '@heroicons/react/24/solid/XMarkIcon'
+import { useDispatch, useSelector } from 'react-redux'
+import NotificationBodyRightDrawer from '../features/common/components/NotificationBodyRightDrawer'
+import { closeRightDrawer } from '../features/common/rightDrawerSlice'
+import { RIGHT_DRAWER_TYPES } from '../utils/globalConstantUtil'
 
 
-function RightSidebar({isOpen, setIsOpen}){
+function RightSidebar(){
+
+    const {isOpen, bodyType, extraObject, header} = useSelector(state => state.rightDrawer)
+    const dispatch = useDispatch()
+
+    const close = (e) => {
+      dispatch(closeRightDrawer(e))
+    }
+
+      
+
     return(
         <div className={" fixed overflow-hidden z-20 bg-gray-900 bg-opacity-25 inset-0 transform ease-in-out " + (isOpen ? " transition-opacity opacity-100 duration-500 translate-x-0  " : " transition-all delay-500 opacity-0 translate-x-full  ")}>
       
@@ -11,23 +25,23 @@ function RightSidebar({isOpen, setIsOpen}){
                         
                         {/* Header */}
                         <div className="navbar   flex pl-4 pr-4   shadow-md ">
-                            <button className="float-left btn btn-circle btn-outline btn-sm" onClick={() => setIsOpen(false)}>
+                            <button className="float-left btn btn-circle btn-outline btn-sm" onClick={() => close()}>
                             <XMarkIcon className="h-5 w-5"/>
                             </button>
-                            <span className="ml-2 font-bold text-xl">Notifications</span>
+                            <span className="ml-2 font-bold text-xl">{header}</span>
                         </div>
 
 
                         {/* ------------------ Content Start ------------------ */}
                         <div className="overflow-y-scroll pl-4 pr-4">
                             <div className="flex flex-col w-full">
+                            {/* Loading drawer body according to different drawer type */}
+                            {
                                 {
-                                    [...Array(15)].map((_, i) => {
-                                        return <div key={i} className="grid mt-3 card bg-base-200 rounded-box p-3">
-                                                {i % 2 === 0 ? `Your sales has increased by 30% yesterday` : `Total likes for instagram post - New launch this week,  has crossed 100k `}
-                                            </div> 
-                                    })
-                                }
+                                        [RIGHT_DRAWER_TYPES.NOTIFICATION] : <NotificationBodyRightDrawer {...extraObject} closeRightDrawer={close}/>,
+                                        [RIGHT_DRAWER_TYPES.DEFAULT] : <div></div>
+                                }[bodyType]
+                            }
                                 
                             </div>
                         </div>
@@ -36,7 +50,7 @@ function RightSidebar({isOpen, setIsOpen}){
 
             </section>
 
-            <section className=" w-screen h-full cursor-pointer " onClick={() => setIsOpen(false)} ></section>
+            <section className=" w-screen h-full cursor-pointer " onClick={() => close()} ></section>
         </div>
     )
 }

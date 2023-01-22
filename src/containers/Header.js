@@ -1,11 +1,14 @@
 import { themeChange } from 'theme-change'
 import React, {  useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { setRightDrawerIsOpen } from '../features/common/headerSlice';
-import BellIcon  from '@heroicons/react/24/solid/BellIcon'
-import Bars3Icon  from '@heroicons/react/24/solid/Bars3Icon'
+import BellIcon  from '@heroicons/react/24/outline/BellIcon'
+import Bars3Icon  from '@heroicons/react/24/outline/Bars3Icon'
 import MoonIcon from '@heroicons/react/24/outline/MoonIcon'
 import SunIcon from '@heroicons/react/24/outline/SunIcon'
+import { openRightDrawer } from '../features/common/rightDrawerSlice';
+import { RIGHT_DRAWER_TYPES } from '../utils/globalConstantUtil'
+
+import { NavLink,  Routes, Link , useLocation} from 'react-router-dom'
 
 
 function Header(){
@@ -16,7 +19,6 @@ function Header(){
 
     useEffect(() => {
         themeChange(false)
-        console.log(currentTheme)
         if(currentTheme === null){
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ) {
                 setCurrentTheme("dark")
@@ -28,13 +30,15 @@ function Header(){
       }, [])
 
 
+    // Opening right sidebar for notification
+    const openNotification = () => {
+        dispatch(openRightDrawer({header : "Notifications", bodyType : RIGHT_DRAWER_TYPES.NOTIFICATION}))
+    }
+
+
     function logoutUser(){
         localStorage.clear();
         window.location.href = '/'
-    }
-
-    const openNotification = () => {
-        dispatch(setRightDrawerIsOpen(true))
     }
 
     return(
@@ -56,7 +60,7 @@ function Header(){
                 {/* Multiple theme selection, uncomment this if you want to enable multiple themes selection, 
                 also includes corporate and retro themes in tailwind.config file */}
                 
-                {/* <select className="select" data-choose-theme>
+                {/* <select className="select select-sm mr-4" data-choose-theme>
                     <option disabled selected>Theme</option>
                     <option value="light">Default</option>
                     <option value="dark">Dark</option>
@@ -66,7 +70,7 @@ function Header(){
 
 
             {/* Light and dark theme selection toogle **/}
-            <label className="swap swap-rotate">
+            <label className="swap ">
                 <input type="checkbox"/>
                 <SunIcon data-set-theme="light" data-act-class="ACTIVECLASS" className={"fill-current w-6 h-6 "+(currentTheme === "dark" ? "swap-on" : "swap-off")}/>
                 <MoonIcon data-set-theme="dark" data-act-class="ACTIVECLASS" className={"fill-current w-6 h-6 "+(currentTheme === "light" ? "swap-on" : "swap-off")} />
@@ -90,13 +94,13 @@ function Header(){
                         </div>
                     </label>
                     <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                        <li>
-                        <a className="justify-between">
-                            Profile
+                        <li className="justify-between">
+                        <Link to={'/app/settings-profile'}>
+                            Profile Settings
                             <span className="badge">New</span>
-                        </a>
+                            </Link>
                         </li>
-                        <li><a>Settings</a></li>
+                        <li className=''><Link to={'/app/settings-billing'}>Bill History</Link></li>
                         <div className="divider mt-0 mb-0"></div>
                         <li><a onClick={logoutUser}>Logout</a></li>
                     </ul>
